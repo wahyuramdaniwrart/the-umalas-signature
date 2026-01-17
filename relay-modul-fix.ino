@@ -9,7 +9,7 @@
 #define PAIR_BUTTON_PIN 0  
 #define STATUS_LED_PIN 14  
 
-const int relayPins[] = {4, 27, 32, 33, 12, 17}; 
+const int relayPins[] = {4, 17, 32, 33, 27, 12}; 
 const int numRelays = sizeof(relayPins) / sizeof(relayPins[0]);
 
 // Variabel Kontrol
@@ -22,7 +22,7 @@ uint32_t pairingTimeout = 0;
 Preferences prefs;
 static RcSwitchReceiver<RX433_DATA_PIN> rcSwitchReceiver;
 
-// --- DEFINISI PROTOKOL (WAJIB ADA) ---
+// --- DEFINISI PROTOKOL ---
 DATA_ISR_ATTR static const RxProtocolTable <
     makeTimingSpec< 1, 33, 20,   1,   31,    1,  3,    3,  1, false>,
     makeTimingSpec< 2, 350, 20,   1,   31,    1,  3,    3,  1, false>,
@@ -38,6 +38,21 @@ void setAllRelays(bool state) {
     }
 }
 
+// Fitur Baru: Animasi Relay Bergantian
+void animateRelays() {
+    setAllRelays(LOW);
+    vTaskDelay(pdMS_TO_TICKS(100));
+    for(int i=0; i<numRelays; i++) {
+        digitalWrite(relayPins[i], HIGH);
+        vTaskDelay(pdMS_TO_TICKS(150));
+        digitalWrite(relayPins[i], LOW);
+    }
+    // Kedip akhir semua relay
+    setAllRelays(HIGH);
+    vTaskDelay(pdMS_TO_TICKS(300));
+    setAllRelays(LOW);
+}
+
 void loadSytemState() {
     prefs.begin("relay_sys", true);
     for (int i = 0; i < numRelays; i++) {
@@ -45,7 +60,6 @@ void loadSytemState() {
         sprintf(key, "id%d", i); 
         sprintf(sKey, "st%d", i);
         savedIDs[i] = prefs.getUInt(key, 0);
-        // Kembalikan status terakhir (ON/OFF)
         digitalWrite(relayPins[i], prefs.getBool(sKey, false));
     }
     masterID = prefs.getUInt("idM", 0);
@@ -71,10 +85,25 @@ void saveID(int index, uint32_t id) {
     }
     prefs.end();
     
-    // Feedback Berhasil
     digitalWrite(STATUS_LED_PIN, HIGH);
     vTaskDelay(pdMS_TO_TICKS(2000));
     digitalWrite(STATUS_LED_PIN, LOW);
+}
+
+// Fitur Baru: Menghapus Semua ID Terdaftar
+void clearPairedDevices() {
+    Serial.println(">>> CLEARING ALL RF IDs <<<");
+    prefs.begin("relay_sys", false);
+    for (int i = 0; i < numRelays; i++) {
+        char key[10]; sprintf(key, "id%d", i);
+        prefs.putUInt(key, 0);
+        savedIDs[i] = 0;
+    }
+    prefs.putUInt("idM", 0);
+    masterID = 0;
+    prefs.end();
+    
+    animateRelays(); // Jalankan feedback relay bergantian
 }
 
 void handleButton() {
@@ -86,8 +115,11 @@ void handleButton() {
     if (isPressed) {
         if (pressStartTime == 0) pressStartTime = millis();
         uint32_t duration = millis() - pressStartTime;
-        if (duration > 10000) digitalWrite(STATUS_LED_PIN, (millis()/50)%2); 
-        else if (duration > 5000) digitalWrite(STATUS_LED_PIN, HIGH); 
+        
+        // Indikator Visual LED saat ditekan
+        if (duration > 10000) digitalWrite(STATUS_LED_PIN, (millis()/50)%2);      // Kedip cepat (Reset)
+        else if (duration > 7000) digitalWrite(STATUS_LED_PIN, (millis()/200)%2); // Kedip sedang (Hapus Data)
+        else if (duration > 5000) digitalWrite(STATUS_LED_PIN, HIGH);             // Panteng (Pair Master)
     } 
     else if (pressStartTime != 0) {
         uint32_t duration = millis() - pressStartTime;
@@ -103,6 +135,9 @@ void handleButton() {
             vTaskDelay(pdMS_TO_TICKS(2000));
             ESP.restart(); 
         } 
+        else if (duration >= 7000) {
+            clearPairedDevices(); // Eksekusi penghapusan ID
+        }
         else if (duration >= 5000) {
             pairingTarget = 6;
             isPairingMode = true;
@@ -142,7 +177,6 @@ void setupHardwareFilter() {
 }
 
 void RF_Core0_Task(void * pvParameters) {
-    // Memulai receiver dengan tabel protokol yang sudah diperbaiki
     rcSwitchReceiver.begin(rxProtocolTable.toTimingSpecTable());
 
     for(;;) {
@@ -196,7 +230,7 @@ void setup() {
     setupHardwareFilter();
 
     xTaskCreatePinnedToCore(RF_Core0_Task, "RF_Task", 4096, NULL, 5, NULL, 0);
-    Serial.println("System Ready. Multi-click for Relay, Long-press for Master.");
+    Serial.println("System Ready. Hold 7s to clear IDs, 10s for Factory Reset.");
 }
 
 void loop() {
