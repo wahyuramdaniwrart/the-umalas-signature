@@ -8,10 +8,10 @@
 #include "soc/rtc_cntl_reg.h"
 
 // --- KONFIGURASI IDENTITAS MODUL ---
-#define MODUL_TYPE 'A'           // Ubah ke 'B' atau 'C' untuk modul lain
-const uint8_t MY_ROOM_ID = 101;  // Harus sama dengan Master
+#define MODUL_TYPE 'C'           // Ubah ke 'B' atau 'C' untuk modul lain
+const char* MY_ROOM_ID = "BG16"; // WAJIB SAMA DENGAN MASTER (Huruf & Angka)
 
-// --- KONFIGURASI KEAMANAN (WAJIB SAMA DENGAN MASTER) ---
+// --- KONFIGURASI KEAMANAN ---
 #define PMK_KEY "MasterKeyRumah01" 
 #define LMK_KEY "LocalKeyRelay_01"
 
@@ -20,14 +20,15 @@ const uint8_t MY_ROOM_ID = 101;  // Harus sama dengan Master
 #define PAIR_BUTTON_PIN 0  
 #define STATUS_LED_PIN 14  
 
-const int relayPins[] = {4, 27, 32, 33, 12, 17}; 
+//const int relayPins[] = {4,12,17,27, 32, 33}; //modul A
+const int relayPins[] = {5, 4 ,12 , 27 , 32 , 33}; //modul B dan C
 const int numRelays = sizeof(relayPins) / sizeof(relayPins[0]);
 
-// --- STRUKTUR DATA ESP-NOW ---
+// --- STRUKTUR DATA ESP-NOW (IDENTIK DENGAN MASTER) ---
 typedef struct {
-    uint8_t roomID;
+    char roomID[10];  // Menampung kombinasi huruf & angka
     uint8_t channel;
-    uint8_t state; // 0=ON, 1=OFF (Sesuai Active Low)
+    uint8_t state;    // 0=ON, 1=OFF (Active Low)
 } Payload;
 
 Payload feedbackData;
@@ -56,9 +57,10 @@ DATA_ISR_ATTR static const RxProtocolTable <
 
 void sendFeedback(int channel, bool isRelayOff) {
     if (!hasMaster) return;
-    feedbackData.roomID = MY_ROOM_ID;
+    // Copy Room ID String ke char array payload
+    strncpy(feedbackData.roomID, MY_ROOM_ID, sizeof(feedbackData.roomID));
     feedbackData.channel = (uint8_t)channel + 1; // Index 1-6
-    feedbackData.state = isRelayOff ? 1 : 0;     // Kirim 0 jika relay ON (LOW)
+    feedbackData.state = isRelayOff ? 1 : 0;     // 0 jika relay ON (LOW)
     esp_now_send(masterMac, (uint8_t *) &feedbackData, sizeof(Payload));
 }
 
@@ -81,7 +83,7 @@ void registerMaster(const uint8_t* mac) {
 }
 
 void OnDataRecv(const uint8_t * mac, const uint8_t *data, int len) {
-    // 1. Respon terhadap scan Pairing Master ("WHOIS")
+    // 1. Respon Pairing Master ("WHOIS")
     if (len == 5 && memcmp(data, "WHOIS", 5) == 0) {
         uint8_t reply[6] = {'H', 'E', 'L', 'L', 'O', MODUL_TYPE};
         esp_now_peer_info_t bcastPeer = {};
@@ -97,7 +99,8 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *data, int len) {
     // 2. Kontrol Relay dari Master
     if (len == sizeof(Payload)) {
         Payload* p = (Payload*)data;
-        if (p->roomID == MY_ROOM_ID) {
+        // Cek kesamaan Room ID menggunakan strcmp
+        if (strcmp(p->roomID, MY_ROOM_ID) == 0) {
             int idx = p->channel - 1;
             if (idx >= 0 && idx < numRelays) {
                 if (p->state == 0xFE || p->state == 0xFD) {
@@ -105,12 +108,11 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *data, int len) {
                     isPairingMode = true;
                     pairingTimeout = millis() + 15000;
                 } else {
-                    // Logika Active Low: 0 dari Master -> digitalWrite LOW (Relay ON)
                     digitalWrite(relayPins[idx], p->state); 
                     
                     prefs.begin("relay_sys", false);
                     char sKey[10]; sprintf(sKey, "st%d", idx);
-                    prefs.putBool(sKey, (p->state == 0)); // Simpan true jika relay ON
+                    prefs.putBool(sKey, (p->state == 0)); 
                     prefs.end();
                 }
             }
@@ -122,7 +124,6 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *data, int len) {
 
 void setAllRelays(bool targetOn) {
     for(int i=0; i<numRelays; i++) {
-        // Jika target ON -> tulis LOW (0), jika target OFF -> tulis HIGH (1)
         uint8_t val = targetOn ? 0 : 1;
         digitalWrite(relayPins[i], val);
         
@@ -143,7 +144,6 @@ void loadSytemState() {
         sprintf(sKey, "st%d", i);
         savedIDs[i] = prefs.getUInt(key, 0);
         
-        // Load status terakhir. Jika tersimpan TRUE (ON), maka beri LOW
         bool lastOn = prefs.getBool(sKey, false);
         digitalWrite(relayPins[i], lastOn ? 0 : 1);
     }
@@ -248,7 +248,6 @@ void RF_Core0_Task(void * pvParameters) {
                 else {
                     for (int i = 0; i < numRelays; i++) {
                         if (val != 0 && val == savedIDs[i]) {
-                            // Toggle state: Jika LOW (0), ganti HIGH (1)
                             uint8_t current = digitalRead(relayPins[i]);
                             uint8_t next = (current == LOW) ? HIGH : LOW;
                             digitalWrite(relayPins[i], next);
@@ -278,7 +277,7 @@ void setup() {
     pinMode(STATUS_LED_PIN, OUTPUT);
     for (int i = 0; i < numRelays; i++) {
         pinMode(relayPins[i], OUTPUT);
-        digitalWrite(relayPins[i], HIGH); // Default OFF (High)
+        digitalWrite(relayPins[i], HIGH); 
     }
     
     loadSytemState();
