@@ -83,6 +83,7 @@ void syncGlobalHmi() {
     }
     if (totalOnGlobal == totalChannels) updateHmi("bt1.val=1");
     else if (totalOnGlobal == 0) updateHmi("bt1.val=0");
+    
     updateHmi("nomorKamar.txt=\"" + String(MY_ROOM_ID) + "\"");
 }
 
@@ -159,6 +160,12 @@ void handleCommand(int id) {
         for (auto &c : channels) { setChannel(c.id, target, true); }
         syncGlobalHmi();
     }
+
+    else if (id == 60) {
+    updateHmi("setting.tStatus.txt=\"REBOOTING MASTER...\"");
+    delay(500); // Beri waktu sebentar untuk kirim data ke HMI
+    ESP.restart(); // Perintah untuk merestart ESP32
+}
     
     // 2. GROUPING (Kitchen, Living, dll)
     else if (id >= 2 && id <= 11) {
