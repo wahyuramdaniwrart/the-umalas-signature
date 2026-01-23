@@ -203,6 +203,14 @@ void setup() {
     }
     loadSytemState();
     WiFi.mode(WIFI_STA);
+    Serial.println("");
+    Serial.println("======================================");
+    Serial.print("MAC ADDRESS SLAVE ");
+    Serial.print(MODUL_TYPE);
+    Serial.print(": ");
+    Serial.println(WiFi.macAddress());
+    Serial.println("======================================");
+    
     if (esp_now_init() == ESP_OK) {
         esp_now_set_pmk((uint8_t *)PMK_KEY);
         esp_now_register_recv_cb(OnDataRecv);
