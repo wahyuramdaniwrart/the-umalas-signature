@@ -225,6 +225,11 @@ void setup() {
     sendQueue = xQueueCreate(50, sizeof(QueueItem));
     
     WiFi.mode(WIFI_STA);
+    Serial.println("");
+    Serial.println("======================================");
+    Serial.print("MAC ADDRESS MASTER: ");
+    Serial.println(WiFi.macAddress());
+    Serial.println("======================================");
     WiFi.disconnect();
     
     if (esp_now_init() != ESP_OK) ESP.restart();
