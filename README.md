@@ -1,4 +1,4 @@
-# Fuck-You 🖕
+# Fuck You Bitch 🖕
 
 PARA BAJINGAN YANG TERHORMAT, MOHON DIPERHTIKAN DENGAN SEKSAMA
 
@@ -26,4 +26,4 @@ kemudian anda perlu menginstall board esp32 pada arduino ide terlebih dahulu aga
 
 6. setelah semua itu selesai anda dapat melakukan instalasi jalur lampu pada masing masing chanel yang sudah di pasang, anda perlu melihat chanel mana yang aktif dan tidak untuk mengetahui ia masuk pada lampu apa.
 
---GOOD LUCK PARA BADJINGAN-- 
+--GOOD LUCK ASSHOLE-- 
