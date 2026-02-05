@@ -3,114 +3,493 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="color-scheme" content="dark">
-  <title>Denah KWH — Sort + Tabel + Online</title>
-  <link rel="stylesheet" href="./assets/styles.css" />
+  <title>Denah Sorter + Tabel Sisa KWH (Offline)</title>
+
+  <style>
+    :root{
+      --bg0:#070b14;
+      --bg1:#0b1220;
+      --card:#0f1930cc;
+      --stroke:#223055;
+      --stroke2:#2a3a66;
+      --text:#e8eefc;
+      --muted:#a7b4d6;
+      --good:#57f287;
+      --warn:#ffcc66;
+      --bad:#ff6b6b;
+      --brand:#2b64ff;
+      --shadow: 0 18px 40px rgba(0,0,0,.35);
+      --r:18px;
+    }
+
+    *{ box-sizing:border-box; }
+    html{ color-scheme: dark; }
+    body{
+      margin:0;
+      color:var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(900px 400px at 10% 0%, rgba(43,100,255,.18), transparent 55%),
+        radial-gradient(700px 380px at 90% 10%, rgba(122,162,255,.16), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      min-height:100vh;
+    }
+
+    .wrap{ max-width:1100px; margin:0 auto; padding:22px; }
+
+    .topbar{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:14px;
+      margin-bottom:14px;
+    }
+    .title{ display:flex; flex-direction:column; gap:8px; }
+    h1{ font-size:22px; margin:0; letter-spacing:.2px; }
+    .sub{
+      color:var(--muted);
+      font-size:13px; line-height:1.35;
+      max-width:780px;
+    }
+
+    .tabs{ display:flex; gap:10px; flex-wrap:wrap; margin: 16px 0 14px; }
+    .tab{
+      border:1px solid rgba(42,58,102,.9);
+      background: rgba(11,19,38,.55);
+      color: var(--text);
+      padding:10px 12px;
+      border-radius: 999px;
+      cursor:pointer;
+      font-weight:900;
+      font-size:13px;
+      transition: transform .06s ease, background .18s ease, border-color .18s ease;
+    }
+    .tab:hover{ background: rgba(15,26,51,.7); }
+    .tab:active{ transform: translateY(1px); }
+    .tab.active{
+      border-color: rgba(43,100,255,.95);
+      background: rgba(43,100,255,.16);
+      box-shadow: 0 0 0 4px rgba(43,100,255,.12);
+    }
+
+    .section{ display:none; }
+    .section.active{ display:block; }
+
+    .card{
+      background: linear-gradient(180deg, rgba(15,25,48,.78), rgba(11,19,38,.6));
+      border: 1px solid rgba(34,48,85,.95);
+      border-radius: var(--r);
+      padding: 14px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .cardHead{
+      display:flex; justify-content:space-between; align-items:flex-start; gap:12px;
+      margin-bottom: 10px;
+    }
+    .cardTitle{ font-weight:900; letter-spacing:.15px; }
+    .cardDesc{ color:var(--muted); font-size:13px; line-height:1.35; margin-top:4px; }
+
+    label{ display:block; margin:10px 0 6px; font-weight:900; letter-spacing:.2px; }
+    input[type="text"], textarea{
+      width:100%;
+      background: rgba(11,19,38,.65);
+      color: var(--text);
+      border: 1px solid rgba(42,58,102,.9);
+      border-radius: 14px;
+      padding: 12px 12px;
+      outline:none;
+    }
+    textarea{ min-height: 140px; resize: vertical; }
+
+    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:12px; }
+
+    button{
+      border:none;
+      background: var(--brand);
+      color:white;
+      padding: 10px 12px;
+      border-radius: 14px;
+      cursor:pointer;
+      font-weight:900;
+      letter-spacing:.2px;
+      transition: transform .06s ease, filter .18s ease;
+      box-shadow: 0 10px 20px rgba(43,100,255,.22);
+    }
+    button:hover{ filter: brightness(1.06); }
+    button:active{ transform: translateY(1px); }
+    button.secondary{
+      background: rgba(17,26,46,.8);
+      border: 1px solid rgba(42,58,102,.9);
+      box-shadow: none;
+    }
+    button:disabled{ opacity:.55; cursor:not-allowed; box-shadow:none; }
+
+    .outCard{
+      margin-top: 12px;
+      background: rgba(11,19,38,.7);
+      border: 1px solid rgba(42,58,102,.85);
+      border-radius: 16px;
+      padding: 12px;
+    }
+    .mono{
+      white-space: pre-wrap;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12.5px;
+      color: #dbe6ff;
+    }
+
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(35,49,79,.85);
+      background: rgba(15,26,51,.65);
+      color: var(--muted);
+      font-size:12px;
+      white-space:nowrap;
+    }
+    .pill strong{ color: var(--text); }
+
+    .tableWrap{ margin-top: 12px; display:none; }
+    .tableFrame{
+      background: rgba(11,19,38,.7);
+      border: 1px solid rgba(42,58,102,.85);
+      border-radius: 16px;
+      padding: 10px;
+      overflow:auto;
+      max-height: 430px;
+    }
+    table{ width:100%; border-collapse: collapse; min-width: 360px; }
+    thead th{
+      position: sticky;
+      top: 0;
+      background: rgba(15,26,51,.95);
+      z-index: 2;
+      text-align:left;
+      padding: 10px;
+      border-bottom: 1px solid rgba(35,49,79,.9);
+    }
+    thead th:last-child, tbody td:last-child{ text-align:right; }
+    tbody td{
+      padding: 10px;
+      border-bottom: 1px solid rgba(35,49,79,.65);
+    }
+    tbody tr:nth-child(even){ background: rgba(7,11,20,.25); }
+
+    /* Export rapat */
+    .export-compact thead th{ position: static !important; }
+    .export-compact th, .export-compact td{ padding: 6px 8px !important; }
+    .export-compact table{ min-width: unset !important; }
+  </style>
 </head>
 
 <body>
   <div class="wrap">
     <div class="topbar">
       <div class="title">
-        <h1>Denah KWH — Sort + Tabel + Online</h1>
-        <div class="sub">
-          Mode 1: Cari online. Mode 2: Urutkan denah (Engineer). Mode 3: Tabel KWH + Export + Save Online (Engineer).
-        </div>
+        <h1>Data List KWH (Offline)</h1>
+        <div class="sub">Versi lama tanpa database: urutkan denah + tabel KWH + export PNG.</div>
       </div>
-
-      <div id="badge" class="badge">
-        <span id="dot" class="dot warn"></span>
-        <span id="badgeText"><strong>Engineer</strong>: terkunci</span>
-      </div>
+      <div class="pill"><strong id="denahCount">0</strong> item denah</div>
     </div>
 
     <div class="tabs">
-      <button class="tab active" data-tab="m1">Mode 1 — Cari Online</button>
-      <button class="tab locked" data-tab="m2" id="tabM2">Mode 2 — Urutkan Denah</button>
-      <button class="tab locked" data-tab="m3" id="tabM3">Mode 3 — Tabel KWH</button>
-      <button class="tab" data-tab="eng">Engineer Mode</button>
+      <button class="tab active" data-tab="m1">Urutkan ROOM</button>
+      <button class="tab" data-tab="m2">Tabel KWH</button>
     </div>
 
     <!-- MODE 1 -->
-    <section id="m1" class="section active">
+    <div id="m1" class="section active">
       <div class="card">
         <div class="cardHead">
           <div>
-            <div class="cardTitle">Mode 1 — Cari ROOM/KODE (Online)</div>
-            <div class="cardDesc">
-              Isi ROOM atau KODE (huruf kecil/besar bebas). Klik <b>Cari</b> → otomatis ambil data online.
-              <br/>Jika ROOM/KODE kosong tapi tanggal diisi → tampilkan semua data pada tanggal tersebut.
-            </div>
+            <div class="cardTitle">Urutkan ROOM</div>
+            <div class="cardDesc">Pisahkan dengan spasi. Contoh: <code>2210 2202 1216 1212 1202 2209</code></div>
           </div>
-          <div class="pill"><strong>Free</strong></div>
+          <div class="pill">Denah: <strong id="m1Stat">0</strong></div>
         </div>
 
-        <div id="mode1Mount"></div>
-      </div>
-    </section>
-
-    <!-- MODE 2 -->
-    <section id="m2" class="section">
-      <div class="card">
-        <div class="cardHead">
-          <div>
-            <div class="cardTitle">Mode 2 — Urutkan ROOM/KODE sesuai DENAH</div>
-            <div class="cardDesc">
-              Tempel daftar ROOM atau KODE, nanti diurutkan sesuai denah + validasi yang tidak ada.
-            </div>
-          </div>
-          <div class="pill"><strong id="m2Stat">Locked</strong></div>
-        </div>
-
-        <div id="mode2Mount"></div>
-      </div>
-    </section>
-
-    <!-- MODE 3 -->
-    <section id="m3" class="section">
-      <div class="card">
-        <div class="cardHead">
-          <div>
-            <div class="cardTitle">Mode 3 — Input Tabel KWH + Export PNG + Save Online</div>
-            <div class="cardDesc">
-              Input data → urut sesuai denah → preview tabel → export PNG rapat → simpan online.
-              <br/><b>Load Online dihapus</b> (otomatis via tombol Cari).
-            </div>
-          </div>
-          <div class="pill"><strong id="m3Stat">Locked</strong></div>
-        </div>
-
-        <div id="mode3Mount"></div>
-      </div>
-    </section>
-
-    <!-- ENGINEER -->
-    <section id="eng" class="section">
-      <div class="card">
-        <div class="cardHead">
-          <div>
-            <div class="cardTitle">Engineer Mode</div>
-            <div class="cardDesc">Masukkan password untuk membuka Mode 2 & 3.</div>
-          </div>
-          <div class="pill"><strong id="engStat">Terkunci</strong></div>
-        </div>
-
-        <label>Password Engineer</label>
-        <input id="engPass" type="password" placeholder="Masukkan password..." style="max-width:320px;" />
+        <label for="roomsInput">ROOM</label>
+        <input id="roomsInput" type="text" placeholder="contoh: 2210 2202 1216 1212 1202 2209" />
 
         <div class="row">
-          <button id="btnEngLogin">Masuk</button>
-          <button class="secondary" id="btnEngLogout">Logout</button>
+          <button id="btnSortRooms">Urutkan</button>
+          <button class="secondary" id="btnClearRooms">Clear</button>
+          <button class="secondary" id="btnCopyRooms" disabled>Copy</button>
         </div>
 
-        <div id="engMsg" class="msg" style="display:none;"></div>
+        <div id="roomsOutCard" class="outCard" style="display:none;">
+          <div id="roomsOutput" class="mono"></div>
+        </div>
       </div>
-    </section>
+    </div>
+
+    <!-- MODE 2 -->
+    <div id="m2" class="section">
+      <div class="card">
+        <div class="cardHead">
+          <div>
+            <div class="cardTitle">Tabel “ROOM/KODE” + SISA KWH</div>
+            <div class="cardDesc">
+              Format bebas satu baris panjang: <code>2111 / A215 47.33 2109 / A211 0</code><br/>
+              Tanda “/” boleh ada/tidak.
+            </div>
+          </div>
+          <div class="pill">Denah: <strong id="m2Stat">0</strong></div>
+        </div>
+
+        <label for="dataInput">DATA</label>
+        <textarea id="dataInput" placeholder="contoh: 2111 / A215 47.33 2109 / A211 0"></textarea>
+
+        <div class="row">
+          <button id="btnBuildTable">Buat Tabel</button>
+          <button class="secondary" id="btnClearData">Clear</button>
+          <button class="secondary" id="btnExportPng" disabled>Export PNG</button>
+          <button class="secondary" id="btnCopyTableText" disabled>Copy Text</button>
+        </div>
+
+        <div id="dataOutCard" class="outCard" style="display:none;">
+          <div id="dataOutput" class="mono"></div>
+        </div>
+
+        <div id="tableWrap" class="tableWrap">
+          <div class="row" style="margin: 12px 0 8px; justify-content:space-between;">
+            <div style="font-weight:900;">Preview tabel</div>
+            <div class="pill"><strong id="rowCount">0</strong> baris</div>
+          </div>
+
+          <div id="tableCapture" class="tableFrame">
+            <table id="resultTable">
+              <thead><tr><th>ROOM</th><th>SISA KWH</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="sub" style="margin-top:12px;">
+          Catatan: kalau ada room tidak ditemukan di denah, tetap ditampilkan tapi posisinya paling bawah.
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- html2canvas untuk export png -->
+  <!-- html2canvas -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
-  <script type="module" src="./js/app.js"></script>
+  <script>
+    // =========================================================
+    // DENAH (versi lama, offline)
+    // =========================================================
+    const DENAH = [
+      // DEPAN 1
+      ["2111","A215"], ["2109","A211"], ["2107","A209"], ["2108","A206"], ["3112","A312"], ["3109","A309"], ["3102","A302"], ["2116","A212"], ["2112","A210"], ["2106","A206A"], ["2103","A205"], ["2101","A201"], ["3110","A310"], ["3103","A303"], ["3101","A301"],
+      // DEPAN 2
+      ["3216","B316"], ["3210","B310"], ["3203","B303"], ["2301","B301"], ["1111","A111"], ["1110","A110A"], ["1107","A107"], ["1102","A102"], ["3212","B312"], ["3209","B309"], ["3202","B302"], ["G101","AG01"], ["A110B","A110B"], ["A109","A109"], ["1103","A103"], ["1101","A101"],
+      // DEPAN 3
+      ["1218","B112"], ["1211","B111"], ["1209","B109"], ["1207","B107"], ["1203","B103"], ["1201","B101"], ["2216","B212"], ["2212","B210"], ["2210","B208"], ["2202","B202A"], ["G201","BG01"], ["1216","B110"], ["1212","B108"], ["B106A","B106A"], ["1202","B102A"], ["2211","B215"], ["2209","B211"], ["2207","B209"], ["2203","B205"], ["2201","B201"],
+      // DEPAN 4
+      ["3507","D305B"], ["3510","D308B"], ["3506","D306"], ["3502","D302"], ["1302","C102"], ["2606","E206"], ["3312","C312"], ["3309","C309"], ["3302","C302"], ["3505","D305A"], ["3508","D308A"], ["3503","D303"], ["1303","C103"], ["1301","C101"], ["3501","D301"], ["3310","C310"], ["3303","C303"], ["3301","C301"],
+      // DEPAN 5
+      ["1309","C107B"], ["2305","C205A"], ["2302","C202"], ["1307","C107A"], ["1312","C106B"], ["3518","D312"], ["3512","D310A"], ["2307","C205B"], ["2303","C203"], ["2301","C201"], ["3603","E303"], ["3601","E301"], ["3516","D310B"], ["1306","C106A"],
+      // DEPAN 6
+      ["2603","E203"], ["2601","E201"], ["1311","C109"], ["2511","D207B"], ["2506","D206"], ["2505","D205A"], ["2502","D202"], ["2316","C212"], ["2311","C209"], ["2308","C208A"], ["2602","E202"], ["2512","D212"], ["1312","C108B"], ["D207A","D207A"], ["2507","D205B"], ["2503","D203"], ["2501","D201"], ["2312","C210"], ["2310","C208B"], ["1310","C108A"],
+      // TENGAH 1
+      ["3306","C306"], ["3308","C308"], ["3602","E302"], ["2306","C206"], ["2508","D208"], ["2605","E205"], ["1509","D107"], ["E105","E105"], ["G505","D605"], ["3305","C305"], ["3307","C307"], ["3509","D307"], ["3605","E305"], ["2309","C207"], ["2510","D210"], ["1305","C105"], ["1512","D110"],
+      // TENGAH 2
+      ["3106","A306"], ["3108","A308"], ["2105","A207"], ["1105","A105"], ["1108","A108"], ["3206","B306"], ["3208","B308"], ["2208","B206"], ["1206","B102"], ["G506","DG06"], ["G108","AG08"], ["BG08","BG08"], ["3105","A305"], ["3107","A307"], ["G207","BG09"], ["2110","A208"], ["1106","A106"], ["3205","B305"], ["3207","B307"], ["2206","B202"], ["2205","B207"], ["1205","B105"], ["G106","AG06"], ["G208","BG08"],
+      // BELAKANG 1
+      ["G305","CG05A"], ["G301","CG01"], ["1603","E103"], ["1601","E101"], ["1507","D105B"], ["1510","D108B"], ["1506","D106"], ["1502","D102"], ["G307","CG05B"], ["G303","CG03"], ["1606","E106"], ["1602","E102"], ["1516","D112"], ["1505","D105A"], ["1508","D108A"], ["1503","D103"], ["1501","D101"],
+      // BELAKANG 2
+      ["G203","BG05"], ["G210","BG10"], ["G212","BG12"], ["G216","BG16"], ["G218","BG18"], ["G102","AG02"], ["G107","AG07"], ["G111","AG11"], ["G110","AG10A"], ["1210","B108A"], ["1208","B106"], ["1316","C110"], ["G603","EG03"], ["G601","EG01"], ["G512","DG10B"], ["G509","DG07B"], ["G506","DG06"], ["G502","DG02"], ["G318","CG12"], ["G311","CG09"], ["G310","CG08A"], ["G202","BG02"], ["G205","BG07"], ["G209","BG11"], ["G211","BG15"], ["G215","BG17"], ["G103","AG03"], ["G105","AG05"], ["G109","AG09"], ["G115","AG15"], ["G112","AG10B"], ["1318","C112"], ["G302","CG02"], ["G606","EG06"], ["G602","EG02"], ["G512","DG12"], ["G510","DG10A"], ["G507","DG07A"], ["G503","DG03"], ["G501","DG01"], ["G316","CG10"], ["G312","CG08B"], ["G308","CG06B"],
+    ];
+
+    const orderMap = new Map();
+    const codeMap  = new Map();
+    DENAH.forEach(([room, code], idx) => { orderMap.set(room, idx); codeMap.set(room, code); });
+
+    document.getElementById("denahCount").textContent = DENAH.length;
+    document.getElementById("m1Stat").textContent = DENAH.length;
+    document.getElementById("m2Stat").textContent = DENAH.length;
+
+    // tabs
+    document.querySelectorAll(".tab").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const target = btn.dataset.tab;
+        document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+        document.getElementById(target).classList.add("active");
+      });
+    });
+
+    // MODE 1
+    const roomsInput  = document.getElementById("roomsInput");
+    const roomsOutCard= document.getElementById("roomsOutCard");
+    const roomsOutput = document.getElementById("roomsOutput");
+    const btnCopyRooms= document.getElementById("btnCopyRooms");
+
+    document.getElementById("btnSortRooms").addEventListener("click", () => {
+      const rooms = roomsInput.value.trim().split(/\s+/).filter(Boolean).map(x => x.toUpperCase());
+      if (!rooms.length) {
+        roomsOutCard.style.display = "block";
+        roomsOutput.textContent = "⚠️ Masukkan ROOM dulu.";
+        btnCopyRooms.disabled = true;
+        return;
+      }
+
+      const sortedRooms = [...rooms].sort((a,b) => (orderMap.get(a) ?? 1e18) - (orderMap.get(b) ?? 1e18));
+      const missing = rooms.filter(r => !orderMap.has(r));
+
+      let out = "URUTAN SESUAI DENAH:\n";
+      out += sortedRooms.map(r => `${r} / ${codeMap.get(r) ?? "-"}`).join("\n");
+
+      if (missing.length) {
+        out += "\n\n⚠️ ROOM TIDAK ADA DI DENAH:\n";
+        out += [...new Set(missing)].map(r => `- ${r}`).join("\n");
+      }
+
+      roomsOutCard.style.display = "block";
+      roomsOutput.textContent = out;
+      btnCopyRooms.disabled = false;
+    });
+
+    document.getElementById("btnClearRooms").addEventListener("click", () => {
+      roomsInput.value = "";
+      roomsOutCard.style.display = "none";
+      roomsOutput.textContent = "";
+      btnCopyRooms.disabled = true;
+    });
+
+    btnCopyRooms.addEventListener("click", async () => {
+      await navigator.clipboard.writeText(roomsOutput.textContent || "");
+    });
+
+    // MODE 2
+    const dataInput   = document.getElementById("dataInput");
+    const dataOutCard = document.getElementById("dataOutCard");
+    const dataOutput  = document.getElementById("dataOutput");
+    const tableWrap   = document.getElementById("tableWrap");
+    const tbody       = document.querySelector("#resultTable tbody");
+    const exportBtn   = document.getElementById("btnExportPng");
+    const copyTextBtn = document.getElementById("btnCopyTableText");
+    const tableCapture= document.getElementById("tableCapture");
+    const rowCount    = document.getElementById("rowCount");
+
+    function normalizeTokens(raw) {
+      return raw.replaceAll("/", " ").trim().split(/\s+/).filter(Boolean);
+    }
+
+    document.getElementById("btnBuildTable").addEventListener("click", () => {
+      const raw = dataInput.value.trim();
+      if (!raw) {
+        dataOutCard.style.display = "block";
+        dataOutput.textContent = "⚠️ Masukkan DATA dulu.";
+        tableWrap.style.display = "none";
+        exportBtn.disabled = true;
+        copyTextBtn.disabled = true;
+        return;
+      }
+
+      const tokens = normalizeTokens(raw);
+      if (tokens.length % 3 !== 0) {
+        dataOutCard.style.display = "block";
+        dataOutput.textContent =
+          "⚠️ Format salah.\nGunakan: ROOM / KODE NILAI\nContoh: 2111 / A215 47.33 2109 / A211 0";
+        tableWrap.style.display = "none";
+        exportBtn.disabled = true;
+        copyTextBtn.disabled = true;
+        return;
+      }
+
+      const data = [];
+      for (let i = 0; i < tokens.length; i += 3) {
+        const room = String(tokens[i]).toUpperCase();
+        const code = String(tokens[i+1]).toUpperCase();
+        const kwh  = tokens[i+2];
+        data.push([room, code, kwh]);
+      }
+
+      data.sort((a,b) => (orderMap.get(a[0]) ?? 1e18) - (orderMap.get(b[0]) ?? 1e18));
+      const missing = data.filter(([room]) => !orderMap.has(room)).map(([room]) => room);
+
+      let out = "HASIL TABEL (text):\n";
+      out += "ROOM/KODE".padEnd(16) + "SISA KWH\n";
+      out += "-".repeat(28) + "\n";
+      out += data.map(([room, code, kwh]) => `${(room + "/" + code).padEnd(16)}${kwh}`).join("\n");
+
+      if (missing.length) {
+        out += "\n\n⚠️ ROOM TIDAK ADA DI DENAH:\n" + [...new Set(missing)].map(r => `- ${r}`).join("\n");
+      }
+
+      dataOutCard.style.display = "block";
+      dataOutput.textContent = out;
+
+      // render table
+      tbody.innerHTML = "";
+      for (const [room, code, kwh] of data) {
+        const tr = document.createElement("tr");
+        const td1 = document.createElement("td");
+        const td2 = document.createElement("td");
+        td1.textContent = `${room}/${code}`;
+        td2.textContent = `${kwh}`;
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        tbody.appendChild(tr);
+      }
+
+      rowCount.textContent = data.length;
+      tableWrap.style.display = "block";
+      exportBtn.disabled = false;
+      copyTextBtn.disabled = false;
+    });
+
+    document.getElementById("btnClearData").addEventListener("click", () => {
+      dataInput.value = "";
+      dataOutCard.style.display = "none";
+      dataOutput.textContent = "";
+      tableWrap.style.display = "none";
+      tbody.innerHTML = "";
+      exportBtn.disabled = true;
+      copyTextBtn.disabled = true;
+      rowCount.textContent = "0";
+    });
+
+    copyTextBtn.addEventListener("click", async () => {
+      await navigator.clipboard.writeText(dataOutput.textContent || "");
+    });
+
+    // export PNG FULL sampai bawah
+    exportBtn.addEventListener("click", async () => {
+      exportBtn.disabled = true;
+      exportBtn.textContent = "Exporting...";
+
+      const frame = tableCapture;
+      const oldMaxHeight = frame.style.maxHeight;
+      const oldOverflow  = frame.style.overflow;
+
+      frame.classList.add("export-compact");
+      frame.style.maxHeight = "none";
+      frame.style.overflow  = "visible";
+
+      // matikan sticky header sementara
+      const ths = frame.querySelectorAll("thead th");
+      const oldPos = [];
+      ths.forEach((th,i)=>{ oldPos[i]=th.style.position; th.style.position="static"; });
+
+      try {
+        const canvas = await html2canvas(frame, { backgroundColor: null, scale: 2 });
+        const link = document.createElement("a");
+        link.download = "tabel_sisa_kwh.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      } finally {
+        ths.forEach((th,i)=> th.style.position = oldPos[i] || "");
+        frame.classList.remove("export-compact");
+        frame.style.maxHeight = oldMaxHeight;
+        frame.style.overflow  = oldOverflow;
+        exportBtn.textContent = "Export PNG";
+        exportBtn.disabled = false;
+      }
+    });
+  </script>
 </body>
 </html>
