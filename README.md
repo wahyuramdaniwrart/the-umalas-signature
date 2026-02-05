@@ -1,7 +1,3 @@
-# Fuck You Bitch 🖕
-
-PARA BAJINGAN YANG TERHORMAT, MOHON DIPERHTIKAN DENGAN SEKSAMA
-
 ## installation
 
 ### Hardware Side
@@ -25,5 +21,3 @@ kemudian anda perlu menginstall board esp32 pada arduino ide terlebih dahulu aga
 5. setelah itu masuk ke dalam proses memasukkan mac address ke dalam kode, mac adress akan memiliki format seperti ini saat muncul di serial monitor 30:C6:F7:45:0B:FC, namun anda perlu mengubahnya menjadi seperti ini pada saat anda memasukkannya ke dalam masing masing kode modul 0x30,0xC6,0xF7,0x45,0x0B,0xFC.
 
 6. setelah semua itu selesai anda dapat melakukan instalasi jalur lampu pada masing masing chanel yang sudah di pasang, anda perlu melihat chanel mana yang aktif dan tidak untuk mengetahui ia masuk pada lampu apa.
-
---GOOD LUCK ASSHOLE-- 
