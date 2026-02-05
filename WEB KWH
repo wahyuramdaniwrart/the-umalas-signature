@@ -1,1 +1,116 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="dark">
+  <title>Denah KWH — Sort + Tabel + Online</title>
+  <link rel="stylesheet" href="./assets/styles.css" />
+</head>
 
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="title">
+        <h1>Denah KWH — Sort + Tabel + Online</h1>
+        <div class="sub">
+          Mode 1: Cari online. Mode 2: Urutkan denah (Engineer). Mode 3: Tabel KWH + Export + Save Online (Engineer).
+        </div>
+      </div>
+
+      <div id="badge" class="badge">
+        <span id="dot" class="dot warn"></span>
+        <span id="badgeText"><strong>Engineer</strong>: terkunci</span>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="m1">Mode 1 — Cari Online</button>
+      <button class="tab locked" data-tab="m2" id="tabM2">Mode 2 — Urutkan Denah</button>
+      <button class="tab locked" data-tab="m3" id="tabM3">Mode 3 — Tabel KWH</button>
+      <button class="tab" data-tab="eng">Engineer Mode</button>
+    </div>
+
+    <!-- MODE 1 -->
+    <section id="m1" class="section active">
+      <div class="card">
+        <div class="cardHead">
+          <div>
+            <div class="cardTitle">Mode 1 — Cari ROOM/KODE (Online)</div>
+            <div class="cardDesc">
+              Isi ROOM atau KODE (huruf kecil/besar bebas). Klik <b>Cari</b> → otomatis ambil data online.
+              <br/>Jika ROOM/KODE kosong tapi tanggal diisi → tampilkan semua data pada tanggal tersebut.
+            </div>
+          </div>
+          <div class="pill"><strong>Free</strong></div>
+        </div>
+
+        <div id="mode1Mount"></div>
+      </div>
+    </section>
+
+    <!-- MODE 2 -->
+    <section id="m2" class="section">
+      <div class="card">
+        <div class="cardHead">
+          <div>
+            <div class="cardTitle">Mode 2 — Urutkan ROOM/KODE sesuai DENAH</div>
+            <div class="cardDesc">
+              Tempel daftar ROOM atau KODE, nanti diurutkan sesuai denah + validasi yang tidak ada.
+            </div>
+          </div>
+          <div class="pill"><strong id="m2Stat">Locked</strong></div>
+        </div>
+
+        <div id="mode2Mount"></div>
+      </div>
+    </section>
+
+    <!-- MODE 3 -->
+    <section id="m3" class="section">
+      <div class="card">
+        <div class="cardHead">
+          <div>
+            <div class="cardTitle">Mode 3 — Input Tabel KWH + Export PNG + Save Online</div>
+            <div class="cardDesc">
+              Input data → urut sesuai denah → preview tabel → export PNG rapat → simpan online.
+              <br/><b>Load Online dihapus</b> (otomatis via tombol Cari).
+            </div>
+          </div>
+          <div class="pill"><strong id="m3Stat">Locked</strong></div>
+        </div>
+
+        <div id="mode3Mount"></div>
+      </div>
+    </section>
+
+    <!-- ENGINEER -->
+    <section id="eng" class="section">
+      <div class="card">
+        <div class="cardHead">
+          <div>
+            <div class="cardTitle">Engineer Mode</div>
+            <div class="cardDesc">Masukkan password untuk membuka Mode 2 & 3.</div>
+          </div>
+          <div class="pill"><strong id="engStat">Terkunci</strong></div>
+        </div>
+
+        <label>Password Engineer</label>
+        <input id="engPass" type="password" placeholder="Masukkan password..." style="max-width:320px;" />
+
+        <div class="row">
+          <button id="btnEngLogin">Masuk</button>
+          <button class="secondary" id="btnEngLogout">Logout</button>
+        </div>
+
+        <div id="engMsg" class="msg" style="display:none;"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- html2canvas untuk export png -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
