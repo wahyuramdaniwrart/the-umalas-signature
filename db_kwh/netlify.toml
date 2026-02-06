@@ -1,0 +1,8 @@
+[build]
+  publish = "frontend"
+
+[functions]
+  directory = "backend/netlify/functions"
+
+[functions."kwh_cleanup"]
+  schedule = "0 2 * * *"

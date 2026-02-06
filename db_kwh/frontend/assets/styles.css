@@ -1,0 +1,302 @@
+:root{
+  --bg0:#070b14;
+  --bg1:#0b1220;
+  --card:#0f1930cc;
+  --stroke:#223055;
+  --stroke2:#2a3a66;
+  --text:#e8eefc;
+  --muted:#a7b4d6;
+  --good:#57f287;
+  --warn:#ffcc66;
+  --bad:#ff6b6b;
+  --brand:#2b64ff;
+  --shadow: 0 18px 40px rgba(0,0,0,.35);
+  --r:18px;
+}
+
+*{ box-sizing:border-box; }
+html{ color-scheme: dark; }
+body{
+  margin:0;
+  color:var(--text);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background:
+    radial-gradient(900px 400px at 10% 0%, rgba(43,100,255,.18), transparent 55%),
+    radial-gradient(700px 380px at 90% 10%, rgba(122,162,255,.16), transparent 60%),
+    linear-gradient(180deg, var(--bg0), var(--bg1));
+  min-height:100vh;
+}
+
+.wrap{ max-width:1100px; margin:0 auto; padding:22px; }
+
+/* ===== Topbar ===== */
+.topbar{
+  position: relative; /* ✅ supaya badge bisa absolute di kanan atas */
+  display:flex;
+  align-items:flex-start;
+  justify-content:flex-start;
+  gap:14px;
+  margin-bottom:14px;
+  padding-right: 140px; /* ✅ ruang supaya judul tidak ketabrak badge */
+}
+.title{ display:flex; flex-direction:column; gap:8px; }
+h1{ font-size:22px; margin:0; letter-spacing:.2px; }
+
+/* Engineer badge always top-right */
+.badge{
+  position:absolute;
+  right:0;
+  top:0;
+  display:inline-flex; align-items:center; gap:8px;
+  padding:8px 10px;
+  border-radius:999px;
+  background: rgba(15,26,51,.75);
+  border:1px solid rgba(35,49,79,.85);
+  font-size:12px;
+  white-space:nowrap;
+}
+
+.badge-click{ cursor:pointer; user-select:none; }
+.badge-click:active{ transform: translateY(1px); }
+
+/* ===== DOT STATUS ===== */
+.dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  display:inline-block;
+  background: var(--warn);
+  box-shadow: 0 0 0 3px rgba(255,204,102,.12);
+}
+.dot.locked{
+  background: var(--bad);
+  box-shadow: 0 0 0 3px rgba(255,107,107,.12);
+}
+.dot.open{
+  background: var(--good);
+  box-shadow: 0 0 0 3px rgba(87,242,135,.12);
+}
+
+/* ===== Tabs ===== */
+.tabs{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin: 16px 0 14px;
+}
+.tab{
+  border:1px solid rgba(42,58,102,.9);
+  background: rgba(11,19,38,.55);
+  color: var(--text);
+  padding:10px 12px;
+  border-radius: 999px;
+  cursor:pointer;
+  font-weight:900;
+  font-size:13px;
+  line-height:1;
+}
+.tab.active{
+  border-color: rgba(43,100,255,.95);
+  background: rgba(43,100,255,.16);
+  box-shadow: 0 0 0 4px rgba(43,100,255,.12);
+}
+
+.hidden{ display:none !important; }
+.section{ display:none; }
+.section.active{ display:block; }
+
+/* ===== Card ===== */
+.card{
+  background: linear-gradient(180deg, rgba(15,25,48,.78), rgba(11,19,38,.6));
+  border: 1px solid rgba(34,48,85,.95);
+  border-radius: var(--r);
+  padding: 14px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+}
+
+.cardHead{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+  margin-bottom: 10px;
+}
+.cardHeadRow{ align-items:center; }
+
+/* ===== Form ===== */
+label{ display:block; margin:10px 0 6px; font-weight:900; }
+input[type="text"], input[type="date"], input[type="password"], textarea{
+  width:100%;
+  background: rgba(11,19,38,.65);
+  color: var(--text);
+  border: 1px solid rgba(42,58,102,.9);
+  border-radius: 14px;
+  padding: 12px 12px;
+  outline:none;
+}
+textarea{ min-height: 130px; resize: vertical; }
+
+/* ===== Buttons ===== */
+.row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+  margin-top:12px;
+}
+button{
+  border:none;
+  background: var(--brand);
+  color:white;
+  padding: 10px 12px;
+  border-radius: 14px;
+  cursor:pointer;
+  font-weight:900;
+  letter-spacing:.2px;
+  box-shadow: 0 10px 20px rgba(43,100,255,.22);
+}
+button.secondary{
+  background: rgba(17,26,46,.8);
+  border: 1px solid rgba(42,58,102,.9);
+  box-shadow: none;
+}
+button:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+  box-shadow:none;
+}
+
+/* ===== Message box ===== */
+.msg{
+  margin-top:12px;
+  background: rgba(11,19,38,.7);
+  border: 1px solid rgba(42,58,102,.85);
+  border-radius: 16px;
+  padding: 12px;
+  white-space: pre-wrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 12.5px;
+  color: #dbe6ff;
+}
+
+/* ===== Table ===== */
+.tableWrap{ margin-top: 12px; }
+.tableFrame{
+  background: rgba(11,19,38,.7);
+  border: 1px solid rgba(42,58,102,.85);
+  border-radius: 16px;
+  padding: 10px;
+  overflow:auto;
+  max-height: 430px;
+  -webkit-overflow-scrolling: touch;
+}
+table{ width:100%; border-collapse: collapse; min-width: 360px; }
+thead th{
+  position: sticky;
+  top: 0;
+  background: rgba(15,26,51,.95);
+  z-index: 2;
+  text-align:left;
+  padding: 10px;
+  border-bottom: 1px solid rgba(35,49,79,.9);
+}
+thead th:last-child, tbody td:last-child{ text-align:right; }
+tbody td{
+  padding: 10px;
+  border-bottom: 1px solid rgba(35,49,79,.65);
+}
+tbody tr:nth-child(even){ background: rgba(7,11,20,.25); }
+
+/* export */
+.export-compact thead th{ position: static !important; }
+.export-compact th, .export-compact td{ padding: 6px 8px !important; }
+.export-compact table{ min-width: unset !important; }
+
+/* =========================
+   RESPONSIVE (Tablet)
+========================= */
+@media (max-width: 900px){
+  .wrap{ padding:16px; }
+  h1{ font-size:20px; }
+  .card{ padding:12px; }
+  .tableFrame{ max-height: 52vh; }
+}
+
+/* =========================
+   RESPONSIVE (HP) - COMPACT
+========================= */
+@media (max-width: 600px){
+  .wrap{ padding:12px; }
+
+  .topbar{
+    padding-right: 120px; /* badge lebih kecil di HP */
+    margin-bottom:10px;
+  }
+
+  h1{ font-size:18px; }
+
+  .badge{
+    padding:6px 8px;
+    font-size:11px;
+  }
+  .dot{ width:8px; height:8px; }
+
+  /* tabs 1 baris + scroll */
+  .tabs{
+    gap:6px;
+    margin:10px 0 10px;
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  .tab{
+    padding:7px 10px;
+    font-size:12px;
+    white-space:nowrap;
+    flex:0 0 auto;
+  }
+
+  .card{ padding:10px; }
+
+  button{
+    width:auto;
+    padding:7px 10px;
+    font-size:12px;
+    border-radius:10px;
+  }
+  button.secondary{ padding:7px 10px; }
+  .row{ gap:6px; }
+
+  input[type="text"], input[type="date"], input[type="password"], textarea{
+    padding:9px 10px;
+    font-size:13px;
+    border-radius:10px;
+  }
+  textarea{ min-height:90px; }
+
+  /* ✅ FIX: tabel HP biar gak kepotong */
+  .tableFrame{ padding:6px; max-height:52vh; overflow-x:auto; }
+
+  table{
+    width:100%;
+    min-width:0;          /* ✅ jangan dipaksa melebar */
+    table-layout:fixed;   /* ✅ kolom kebagi rapi */
+  }
+  thead th, tbody td{
+    padding:7px 8px;
+    font-size:12px;
+    white-space:normal;
+    word-break:break-word;
+  }
+
+  /* pembagian kolom biar semua kelihatan */
+  thead th:nth-child(1), tbody td:nth-child(1){ width: 42%; } /* WAKTU */
+  thead th:nth-child(2), tbody td:nth-child(2){ width: 33%; } /* ROOM/KODE */
+  thead th:nth-child(3), tbody td:nth-child(3){ width: 25%; } /* SISA KWH */
+}
+
+@media (max-width: 360px){
+  h1{ font-size:17px; }
+  .tab{ font-size:11px; padding:6px 9px; }
+}

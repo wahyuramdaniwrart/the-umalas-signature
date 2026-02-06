@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>Umalas Signature — KWH</title>
+
+  <link rel="stylesheet" href="./assets/styles.css" />
+</head>
+
+<body>
+  <div class="wrap">
+
+    <div class="topbar">
+      <div class="title">
+        <h1>Umalas Signature — KWH</h1>
+      </div>
+
+      <!-- Engineer badge: klik dot hijau untuk logout -->
+      <div class="badge badge-click" id="engBadge" title="Klik dot hijau untuk logout">
+        <span id="dot" class="dot locked"></span>
+        <span><strong>Engineer</strong></span>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="m1">ROOM</button>
+      <button class="tab" data-tab="eng">Engineer</button>
+    </div>
+
+    <!-- MODE 1 -->
+    <section id="m1" class="section active">
+      <div class="card">
+        <div id="mode1Mount"></div>
+      </div>
+    </section>
+
+    <!-- ENGINEER -->
+    <section id="eng" class="section">
+
+      <!-- LOGIN -->
+      <div class="card" id="engLoginCard">
+        <label>Password Engineer</label>
+        <input id="engPass" type="password" placeholder="Masukkan password..." />
+
+        <div class="row">
+          <button id="btnEngLogin">Login</button>
+        </div>
+
+        <div id="engMsg" class="msg" style="display:none;"></div>
+      </div>
+
+      <!-- ENGINEER TOOLS -->
+      <div id="engTools" class="hidden" style="margin-top:14px;">
+        <div class="card">
+
+          <div class="cardHead cardHeadRow">
+            <div class="tabs engTabs">
+              <button class="tab active" data-engtab="mode2">List KWH</button>
+              <button class="tab" data-engtab="mode3">Tabel KWH</button>
+              <button class="tab" data-engtab="mode4">Data Base</button>
+            </div>
+          </div>
+
+          <div id="eng_mode2" style="margin-top:12px;">
+            <div id="mode2Mount"></div>
+          </div>
+
+          <div id="eng_mode3" class="hidden" style="margin-top:12px;">
+            <div id="mode3Mount"></div>
+          </div>
+
+          <div id="eng_mode4" class="hidden" style="margin-top:12px;">
+            <div id="mode4Mount"></div>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+  </div>
+
+  <!-- html2canvas untuk export PNG -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
