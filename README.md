@@ -10,7 +10,7 @@
 1. perisapan pada sisi laptop untuk anda memprogram ulang modul, anda perlu menginstall software arduino ide sebagai jembatan untuk melakukan proses compile program, lalu anda juga perlu melakukan installasi beberapa library yang dibutuhkan oleh kode yang sudah disapkan agar proses compilasi berjalan dan tidak terjadi error, library nya antara lain
    . RcSwitchReceiver.h
    .
-kemudian anda perlu menginstall board esp32 pada arduino ide terlebih dahulu agar board esp32 anda bisa di deteksi, jika arduino ide anda belum memiliki board esp32 maka copy link ini https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json dan pergi ke File->Preferences lalu masukkan pada additional board URLs.
+kemudian anda perlu menginstall board esp32 pada arduino ide terlebih dahulu agar board esp32 anda bisa di deteksi, jika arduino ide anda belum memiliki board esp32 maka copy link ini https://espressif.github.io/arduino-esp32/package_esp32_index.json dan pergi ke File->Preferences lalu masukkan pada additional board URLs.
 
 2. jika sudah melakukan persiapan lingkungan kompilasi kode di atas kita masuk pada proses setting kode, anda perlu mesetting LMK dan PMK key pada setiap ruangan, ini untuk memastikan tidak adanya ruangan yang dapat mengontrol ruangan lainnya karena kesamaan kunci.
 
